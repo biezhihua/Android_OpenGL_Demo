@@ -1,6 +1,6 @@
 package com.bzh.gl.lesson7;
 
-import android.app.Activity;
+import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -11,51 +11,93 @@ import javax.microedition.khronos.opengles.GL10;
 @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
 public class NativeSevenRenderer implements GLSurfaceView.Renderer, Action {
 
-    private Activity mActivity;
+    private LessonSevenActivity mActivity;
     private GLSurfaceView mGlSurfaceView;
 
-    public NativeSevenRenderer(Activity activity, GLSurfaceView glSurfaceView) {
+    public NativeSevenRenderer(LessonSevenActivity activity, GLSurfaceView glSurfaceView) {
         mActivity = activity;
         mGlSurfaceView = glSurfaceView;
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        NativeSevenJniLib.onSurfaceCreate(mActivity.getAssets());
+        nativeSurfaceCreate(mActivity.getAssets());
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        NativeSevenJniLib.onSurfaceChange(width, height);
+        nativeSurfaceChange(width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        NativeSevenJniLib.onDrawFrame();
+        nativeDrawFrame();
+    }
+
+    @Override
+    public void init() {
+        nativeInit();
+    }
+
+    @Override
+    public void destroy() {
+        nativeDestroy();
     }
 
     @Override
     public void setDelta(float deltaX, float deltaY) {
-        NativeSevenJniLib.setDelta(deltaX, deltaY);
+        nativeSetDelta(deltaX, deltaY);
     }
 
     @Override
     public void decreaseCubeCount() {
-        NativeSevenJniLib.decreaseCubeCount();
+        nativeDecreaseCubeCount();
     }
 
     @Override
     public void increaseCubeCount() {
-        NativeSevenJniLib.increaseCubeCount();
+        nativeIncreaseCubeCount();
     }
 
     @Override
     public void toggleVBOs() {
-        NativeSevenJniLib.toggleVBOs();
+        nativeToggleVBOs();
     }
 
     @Override
     public void toggleStride() {
-        NativeSevenJniLib.toggleStride();
+        nativeToggleStride();
     }
+
+    {
+        System.loadLibrary("lesson-lib");
+    }
+
+    public void updateVboStatus(boolean useVbos) {
+        mActivity.updateVboStatus(useVbos);
+    }
+
+    public void updateStrideStatus(boolean useStride) {
+        mActivity.updateStrideStatus(useStride);
+    }
+
+    public native void nativeInit();
+
+    public native void nativeDestroy();
+
+    public native void nativeSurfaceCreate(AssetManager assetManager);
+
+    public native void nativeSurfaceChange(int width, int height);
+
+    public native void nativeDrawFrame();
+
+    public native void nativeSetDelta(float x, float y);
+
+    public native void nativeDecreaseCubeCount();
+
+    public native void nativeIncreaseCubeCount();
+
+    public native void nativeToggleVBOs();
+
+    public native void nativeToggleStride();
 }

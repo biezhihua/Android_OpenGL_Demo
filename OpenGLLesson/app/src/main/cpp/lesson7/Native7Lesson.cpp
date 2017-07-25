@@ -4,6 +4,7 @@
 
 #include <graphics/GLUtils.h>
 #include "Native7Lesson.h"
+#include "GenData.h"
 #include <android/log.h>
 
 #define LOG_TAG "Lesson"
@@ -11,8 +12,18 @@
 #define LOGD(fmt, args...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ##args)
 #define LOGE(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, fmt, ##args)
 
+// processing callback to handler class
+typedef struct context {
+    JavaVM *javaVM;
+    jclass nativeRendererClz;
+    jobject nativeRendererObj;
+} Context;
+
+static Native7Lesson *lesson7;
+static GenData *genData;
+static Context g_ctx;
+
 Native7Lesson::Native7Lesson() {
-    mGenData = new GenData();
 
     mViewMatrix = nullptr;
     mModelMatrix = nullptr;
@@ -42,8 +53,8 @@ Native7Lesson::Native7Lesson() {
 }
 
 Native7Lesson::~Native7Lesson() {
-    delete mGenData;
-    mGenData = nullptr;
+    delete genData;
+    genData = nullptr;
     delete mModelMatrix;
     mModelMatrix = nullptr;
     delete mViewMatrix;
@@ -56,7 +67,9 @@ Native7Lesson::~Native7Lesson() {
 
 void Native7Lesson::create() {
 
-    mGenData->genCube(3, false, false);
+//    genData->setNative7Lesson(this);
+
+    genData->genCube(3, false, false);
 
     // Set the background clear color to black
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -153,10 +166,10 @@ void Native7Lesson::draw() {
     GLuint textureCoordinateHandle = (GLuint) glGetAttribLocation(mProgramHandle,
                                                                   "a_TexCoordinate");
 
-    if (mGenData != nullptr && mGenData->getCubes() != nullptr) {
-        mGenData->getCubes()->setNormalHandle(normalHandle);
-        mGenData->getCubes()->setPositionHandle(positionHandle);
-        mGenData->getCubes()->setTextureCoordinateHandle(textureCoordinateHandle);
+    if (genData != nullptr && genData->getCubes() != nullptr) {
+        genData->getCubes()->setNormalHandle(normalHandle);
+        genData->getCubes()->setPositionHandle(positionHandle);
+        genData->getCubes()->setTextureCoordinateHandle(textureCoordinateHandle);
     }
 
     // Calculate position of the light
@@ -234,20 +247,20 @@ void Native7Lesson::draw() {
     // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
     glUniform1i(mTextureUniformHandle, 0);
 
-    if (mGenData != nullptr && mGenData->getCubes() != nullptr) {
-        mGenData->getCubes()->renderer();
+    if (genData != nullptr && genData->getCubes() != nullptr) {
+        genData->getCubes()->renderer();
     }
 }
 
 void Native7Lesson::decreaseCubeCount() {
-    if (mGenData != nullptr && mGenData->mLastRequestedCubeFactor > 1) {
-        mGenData->genCube(--mGenData->mLastRequestedCubeFactor, false, false);
+    if (genData != nullptr && genData->mLastRequestedCubeFactor > 1) {
+        genData->genCube(--genData->mLastRequestedCubeFactor, false, false);
     }
 }
 
 void Native7Lesson::increaseCubeCount() {
-    if (mGenData != nullptr && mGenData->mLastRequestedCubeFactor < 16) {
-        mGenData->genCube(++mGenData->mLastRequestedCubeFactor, false, false);
+    if (genData != nullptr && genData->mLastRequestedCubeFactor < 16) {
+        genData->genCube(++genData->mLastRequestedCubeFactor, false, false);
     }
 }
 
@@ -257,9 +270,149 @@ void Native7Lesson::setDelta(float x, float y) {
 }
 
 void Native7Lesson::toggleStride() {
-    mGenData->genCube(mGenData->mLastRequestedCubeFactor, false, true);
+    genData->genCube(genData->mLastRequestedCubeFactor, false, true);
 }
 
 void Native7Lesson::toggleVBOs() {
-    mGenData->genCube(mGenData->mLastRequestedCubeFactor, true, false);
+    genData->genCube(genData->mLastRequestedCubeFactor, true, false);
+}
+
+void Native7Lesson::updateVboStatus(bool useVbos) {
+    LOGD("updateVboStatus %d", useVbos);
+    Context *pctx = &g_ctx;
+    JavaVM *javaVM = pctx->javaVM;
+    JNIEnv *env;
+    jint res = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (JNI_OK != res) {
+        LOGE("Failed to Get env, ErrorCode = %d", res);
+        return;
+    }
+    jmethodID statusId = env->GetMethodID(pctx->nativeRendererClz, "updateVboStatus", "(Z)V");
+    env->CallVoidMethod(pctx->nativeRendererObj, statusId, useVbos);
+}
+
+void Native7Lesson::updateStrideStatus(bool useStride) {
+    LOGD("updateStrideStatus %d", useStride);
+    Context *pctx = &g_ctx;
+    JavaVM *javaVM = pctx->javaVM;
+    JNIEnv *env;
+    jint res = javaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (JNI_OK != res) {
+        LOGE("Failed to Get env, ErrorCode = %d", res);
+        return;
+    }
+    jmethodID statusId = env->GetMethodID(pctx->nativeRendererClz, "updateStrideStatus", "(Z)V");
+    env->CallVoidMethod(pctx->nativeRendererObj, statusId, useStride);
+}
+
+// ----------------------------------------------------------
+extern "C"
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    memset(&g_ctx, 0, sizeof(g_ctx));
+
+    g_ctx.javaVM = vm;
+    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+        return JNI_ERR; // JNI version not supported.
+    }
+    g_ctx.nativeRendererObj = NULL;
+    return JNI_VERSION_1_6;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeToggleStride(JNIEnv *env, jobject instance) {
+    if (lesson7 != nullptr) {
+        lesson7->toggleStride();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeToggleVBOs(JNIEnv *env, jobject instance) {
+    if (lesson7 != nullptr) {
+        lesson7->toggleVBOs();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeIncreaseCubeCount(JNIEnv *env, jobject instance) {
+    if (lesson7 != nullptr) {
+        lesson7->increaseCubeCount();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeDecreaseCubeCount(JNIEnv *env, jobject instance) {
+    if (lesson7 != nullptr) {
+        lesson7->decreaseCubeCount();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeSetDelta(JNIEnv *env, jobject instance, jfloat x,
+                                                           jfloat y) {
+    if (lesson7 != nullptr) {
+        lesson7->setDelta(x, y);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeDrawFrame(JNIEnv *env, jobject instance) {
+    if (lesson7 != nullptr) {
+        lesson7->draw();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeSurfaceChange(JNIEnv *env, jobject instance,
+                                                                jint width, jint height) {
+    if (lesson7 != nullptr) {
+        lesson7->change(width, height);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeSurfaceCreate(JNIEnv *env, jobject instance,
+                                                                jobject assetManager) {
+
+    GLUtils::setEnvAndAssetManager(env, assetManager);
+    lesson7 = new Native7Lesson();
+    genData = new GenData(lesson7);
+    if (lesson7 != nullptr) {
+        lesson7->create();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeDestroy(JNIEnv *env, jobject instance) {
+    env->DeleteGlobalRef(g_ctx.nativeRendererClz);
+    env->DeleteGlobalRef(g_ctx.nativeRendererObj);
+    g_ctx.nativeRendererClz = NULL;
+    g_ctx.nativeRendererObj = NULL;
+
+    if (lesson7 != nullptr) {
+        delete (lesson7);
+        lesson7 = NULL;
+    }
+    if (genData != nullptr) {
+        delete (genData);
+        genData = NULL;
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_bzh_gl_lesson7_NativeSevenRenderer_nativeInit(JNIEnv *env, jobject instance) {
+    jclass clz = env->GetObjectClass(instance);
+    g_ctx.nativeRendererClz = (jclass) env->NewGlobalRef(clz);
+    g_ctx.nativeRendererObj = env->NewGlobalRef(instance);
+
 }

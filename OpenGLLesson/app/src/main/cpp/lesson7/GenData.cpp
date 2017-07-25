@@ -3,10 +3,10 @@
 //
 
 #include "GenData.h"
-#include "CubesClientSide.h"
 #include "CubesClientSideWithStride.h"
 #include "CubesWithVbo.h"
 #include "CubesWithVboWithStride.h"
+#include "CubesClientSide.h"
 
 vector<float> GenData::CUBE_TEXTURE_COORDINATE_DATA = {
         // Front face
@@ -316,13 +316,16 @@ void GenData::genCube(int requestedCubeFactor, bool toggleVbos, bool toggleStrid
     }
 
     mUseVBOs = useVBOs;
-//    mLessonSevenActivity.updateVboStatus(mUseVBOs);
-
     mUseStride = useStride;
-//    mLessonSevenActivity.updateStrideStatus(mUseStride);
 
+    if (lesson7 != nullptr) {
+        lesson7->updateVboStatus(mUseVBOs);
+        lesson7->updateStrideStatus(mUseStride);
+    }
 }
 
 Cubes *GenData::getCubes() const {
     return mCubes;
 }
+
+

@@ -12,7 +12,6 @@
 #define LOGD(fmt, args...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ##args)
 #define LOGE(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, fmt, ##args)
 
-static GLint BYTES_PER_FLOAT = 4;
 static GLint POSITION_DATA_SIZE = 3;
 static GLint COLOR_DATA_SIZE = 4;
 static GLint NORMAL_DATA_SIZE = 3;

@@ -1,6 +1,8 @@
 package com.bzh.gl.lesson7;
 
 interface Action {
+    void init();
+    void destroy();
     void setDelta(float deltaX, float deltaY);
     void decreaseCubeCount();
     void increaseCubeCount();

@@ -41,6 +41,7 @@ public class LessonSevenActivity extends AppCompatActivity {
             // Set the renderer to out demo renderer, define now
 //            mRender = new LessonSevenRenderer(this, mGlSurfaceView);
             mRender = new NativeSevenRenderer(this, mGlSurfaceView);
+            mRender.init();
             mGlSurfaceView.setRenderer((GLSurfaceView.Renderer) mRender, displayMetrics.density);
         } else {
             return;
@@ -151,5 +152,11 @@ public class LessonSevenActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRender.destroy();
     }
 }

@@ -2,12 +2,13 @@
 // Created by biezhihua on 2017/7/22.
 //
 
-#ifndef INC_21CPLUSPLUS_GENDATARUNNABLE_H
-#define INC_21CPLUSPLUS_GENDATARUNNABLE_H
+#ifndef OPENGLLESSON_GENDATA_H
+#define OPENGLLESSON_GENDATA_H
 
 #include <iostream>
 #include <vector>
 #include "Cubes.h"
+#include "Native7Lesson.h"
 
 using namespace std;
 
@@ -22,6 +23,8 @@ public:
     bool mUseStride = false;
 
 private:
+
+    Native7Lesson *lesson7;
 
     Cubes *mCubes;
 
@@ -45,11 +48,12 @@ private:
     vector<float> *generatorCubeData(int requestedCubeFactor);
 
 public:
-    GenData() {
+    GenData(Native7Lesson *pLesson) : lesson7(pLesson) {
         mCubes = nullptr;
     }
 
     ~GenData() {
+        lesson7 = nullptr;
         if (mCubes != nullptr) {
             mCubes->release();
             delete (mCubes);

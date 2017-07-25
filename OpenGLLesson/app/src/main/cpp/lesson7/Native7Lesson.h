@@ -8,8 +8,6 @@
 
 #include <GLES2/gl2.h>
 #include <graphics/Matrix.h>
-#include "GenData.h"
-#include "CubesClientSide.h"
 
 class Native7Lesson {
 public:
@@ -33,9 +31,11 @@ public:
 
     void toggleVBOs();
 
-private:
+    void updateVboStatus(bool useVbos);
 
-    GenData *mGenData;
+    void updateStrideStatus(bool useStride);
+
+private:
 
     // model/view/projection matrix
     Matrix *mModelMatrix;

@@ -197,6 +197,16 @@ public class LessonSevenRenderer implements GLSurfaceView.Renderer, Action {
     }
 
     @Override
+    public void init() {
+
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
     public void setDelta(float deltaX, float deltaY) {
         mDeltaX += deltaX;
         mDeltaY += deltaY;

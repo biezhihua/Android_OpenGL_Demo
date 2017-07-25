@@ -58,7 +58,8 @@ add_library( # Sets the name of the library.
              src/main/cpp/lesson6/Native6Lesson.h
 
              # lesson7
-             src/main/cpp/lesson7/lesson7.cpp
+             src/main/cpp/lesson7/Native7Lesson.cpp
+             src/main/cpp/lesson7/Native7Lesson.h
              src/main/cpp/lesson7/Cubes.cpp
              src/main/cpp/lesson7/Cubes.h
              src/main/cpp/lesson7/CubesClientSide.cpp
@@ -71,8 +72,6 @@ add_library( # Sets the name of the library.
              src/main/cpp/lesson7/CubesWithVboWithStride.h
              src/main/cpp/lesson7/GenData.cpp
              src/main/cpp/lesson7/GenData.h
-             src/main/cpp/lesson7/Native7Lesson.cpp
-             src/main/cpp/lesson7/Native7Lesson.h
 
              # native
              src/main/cpp/native_lesson1/lesson1.cpp

@@ -159,7 +159,7 @@ GLfloat *GLUtils::generateCubeData(float *point1,
     int BACK = 2;
     int LEFT = 3;
     int TOP = 4;
-    int BOTTOM = 5;
+//    int BOTTOM = 5;
 
     int size = elementsPerPoint * 6 * 6;
     float *cubeData = new float[size];
