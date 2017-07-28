@@ -17,6 +17,7 @@ import com.bzh.gl.lesson4.LessonFourActivity;
 import com.bzh.gl.lesson5.LessonFiveActivity;
 import com.bzh.gl.lesson6.LessonSixActivity;
 import com.bzh.gl.lesson7.LessonSevenActivity;
+import com.bzh.gl.lesson8.LessonEightActivity;
 import com.bzh.gl.native_lesson1.NativeLesson1Activity;
 
 import java.util.ArrayList;
@@ -104,23 +105,14 @@ public class TableOfContents extends ListActivity {
             activityMapping.put(i++, LessonSevenActivity.class);
         }
 
-//		{
-//			final Map<String, Object> item = new HashMap<String, Object>();
-//			item.put(ITEM_IMAGE, R.drawable.ic_lesson_eight);
-//			item.put(ITEM_TITLE, getText(R.string.lesson_eight));
-//			item.put(ITEM_SUBTITLE, getText(R.string.lesson_eight_subtitle));
-//			data.add(item);
-//			activityMapping.put(i++, LessonEightActivity.class);
-//		}
-
-        {
-            final Map<String, Object> item = new HashMap<String, Object>();
-            item.put(ITEM_IMAGE, R.drawable.ic_lesson_eight);
-            item.put(ITEM_TITLE, getText(R.string.lesson_eight));
-            item.put(ITEM_SUBTITLE, getText(R.string.lesson_eight_subtitle));
-            data.add(item);
-            activityMapping.put(i++, NativeLesson1Activity.class);
-        }
+		{
+			final Map<String, Object> item = new HashMap<String, Object>();
+			item.put(ITEM_IMAGE, R.drawable.ic_lesson_eight);
+			item.put(ITEM_TITLE, getText(R.string.lesson_eight));
+			item.put(ITEM_SUBTITLE, getText(R.string.lesson_eight_subtitle));
+			data.add(item);
+			activityMapping.put(i++, LessonEightActivity.class);
+		}
 
         final SimpleAdapter dataAdapter = new SimpleAdapter(this, data, R.layout.toc_item, new String[]{ITEM_IMAGE, ITEM_TITLE, ITEM_SUBTITLE}, new int[]{R.id.Image, R.id.Title, R.id.SubTitle});
         setListAdapter(dataAdapter);

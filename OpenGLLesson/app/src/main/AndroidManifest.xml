@@ -24,6 +24,7 @@
         <activity android:name=".lesson5.LessonFiveActivity"/>
         <activity android:name=".lesson6.LessonSixActivity"/>
         <activity android:name=".lesson7.LessonSevenActivity"/>
+        <activity android:name=".lesson8.LessonEightActivity"/>
         <activity android:name=".native_lesson1.NativeLesson1Activity"/>
     </application>
 
