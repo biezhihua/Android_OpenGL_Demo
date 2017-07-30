@@ -306,6 +306,7 @@ void Native7Lesson::updateStrideStatus(bool useStride) {
 }
 
 // ----------------------------------------------------------
+
 extern "C"
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;

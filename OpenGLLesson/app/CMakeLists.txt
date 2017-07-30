@@ -73,6 +73,12 @@ add_library( # Sets the name of the library.
              src/main/cpp/lesson7/GenData.cpp
              src/main/cpp/lesson7/GenData.h
 
+             # lesson8
+             src/main/cpp/lesson8/Native8Lesson.cpp
+             src/main/cpp/lesson8/Native8Lesson.h
+             src/main/cpp/lesson8/HeightMap.cpp
+             src/main/cpp/lesson8/HeightMap.h
+
              # native
              src/main/cpp/native_lesson1/lesson1.cpp
              )
