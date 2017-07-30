@@ -12,7 +12,6 @@ class Native8Lesson {
 
 public :
 
-
     Native8Lesson();
 
     ~Native8Lesson();
@@ -26,49 +25,35 @@ public :
     void setDelta(float x, float y);
 
 private:
-
     /**
     * Identifiers for our uniforms and attributes inside the shaders.
     */
-    static const string MVP_MATRIX_UNIFORM = "u_MVPMatrix";
-    static const string MV_MATRIX_UNIFORM = "u_MVMatrix";
-    static const string LIGHT_POSITION_UNIFORM = "u_LightPos";
+    static const string MVP_MATRIX_UNIFORM;
+    static const string MV_MATRIX_UNIFORM;
+    static const string LIGHT_POSITION_UNIFORM;
 
-    static const string POSITION_ATTRIBUTE = "a_Position";
-    static const string NORMAL_ATTRIBUTE = "a_Normal";
-    static const string COLOR_ATTRIBUTE = "a_Color";
-
-    /**
-     * Additional constants.
-     */
-    static const int POSITION_DATA_SIZE_IN_ELEMENTS = 3;
-    static const int NORMAL_DATA_SIZE_IN_ELEMENTS = 3;
-    static const int COLOR_DATA_SIZE_IN_ELEMENTS = 4;
-
-    static const int BYTES_PER_FLOAT = 4;
-    static const int BYTES_PER_SHORT = 2;
-
-    static const int STRIDE = (POSITION_DATA_SIZE_IN_ELEMENTS + NORMAL_DATA_SIZE_IN_ELEMENTS +
-                               COLOR_DATA_SIZE_IN_ELEMENTS) * BYTES_PER_FLOAT;
+    static const string POSITION_ATTRIBUTE;
+    static const string NORMAL_ATTRIBUTE;
+    static const string COLOR_ATTRIBUTE;
 
     /**
      * Used to hold a light centered on the origin in model space.
      * We need a 4th coordinate so we can get translations to
      * work when we multiply this by our transformation matrices.
      */
-    float lightPosInModelSpace[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    float lightPosInModelSpace[4];
 
     /**
      * Used to hold the current position of the light in world space
      * (after transformation via model matrix).
      */
-    float lightPosInWorldSpace[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    float lightPosInWorldSpace[4];
 
     /**
      * Used to hold the transformed position of the light in eye space
      * (after transformation via modelview matrix).
      */
-    float lightPosInEyeSpace[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    float lightPosInEyeSpace[4];
 
     /**
      * Store the model matrix.
@@ -110,12 +95,6 @@ private:
     GLint mvMatrixUniform;
     GLint lightPosUniform;
 
-    /**
-     * OpenGL handles to our program attributes.
-     */
-    GLint posotionAttribute;
-    GLint normalAttribute;
-    GLint colorAttribute;
 
     /**
      * This is a handle to our cube shading program.

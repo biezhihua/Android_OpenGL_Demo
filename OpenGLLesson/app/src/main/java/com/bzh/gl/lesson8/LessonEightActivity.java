@@ -32,7 +32,8 @@ public class LessonEightActivity extends AppCompatActivity {
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
             // Set the renderer to our demo renderer, defined below.
-            mRender = (Action) new LessonEightRenderer(this);
+//            mRender = (Action) new LessonEightRenderer(this);
+            mRender = (Action) new NativeEightRenderer(this);
             mGlSurfaceView.setRenderer((GLSurfaceView.Renderer) mRender, displayMetrics.density);
         } else {
             // This is where you could create an OpenGL ES 1.x compatible

@@ -1,11 +1,10 @@
 package com.bzh.gl.lesson8;
 
+import android.app.Activity;
 import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-
-import com.bzh.gl.lesson7.LessonSevenActivity;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -13,16 +12,14 @@ import javax.microedition.khronos.opengles.GL10;
 @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
 public class NativeEightRenderer implements GLSurfaceView.Renderer, Action {
 
-    private LessonSevenActivity mActivity;
-    private GLSurfaceView mGlSurfaceView;
+    private Activity mActivity;
 
     static {
         System.loadLibrary("lesson-lib");
     }
 
-    public NativeEightRenderer(LessonSevenActivity activity, GLSurfaceView glSurfaceView) {
+    public NativeEightRenderer(Activity activity) {
         mActivity = activity;
-        mGlSurfaceView = glSurfaceView;
     }
 
     @Override

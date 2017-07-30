@@ -7,10 +7,18 @@
 #include <android/log.h>
 #include <graphics/GLUtils.h>
 
-#define LOG_TAG "Lesson"
+#define LOG_TAG "Lesson8"
 #define LOGI(fmt, args...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, fmt, ##args)
 #define LOGD(fmt, args...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ##args)
 #define LOGE(fmt, args...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, fmt, ##args)
+
+const string Native8Lesson::MVP_MATRIX_UNIFORM = "u_MVPMatrix";
+const string Native8Lesson::MV_MATRIX_UNIFORM = "u_MVMatrix";
+const string Native8Lesson::LIGHT_POSITION_UNIFORM = "u_LightPos";
+
+const string Native8Lesson::POSITION_ATTRIBUTE = "a_Position";
+const string Native8Lesson::NORMAL_ATTRIBUTE = "a_Normal";
+const string Native8Lesson::COLOR_ATTRIBUTE = "a_Color";
 
 Native8Lesson::Native8Lesson() : modelMatrix(nullptr),
                                  viewMatrix(nullptr),
@@ -21,6 +29,22 @@ Native8Lesson::Native8Lesson() : modelMatrix(nullptr),
                                  lightModelMatrix(nullptr),
                                  heightMap(nullptr) {
     LOGD("Native8Lesson");
+
+    lightPosInModelSpace[0] = 0.0f;
+    lightPosInModelSpace[1] = 0.0f;
+    lightPosInModelSpace[2] = 0.0f;
+    lightPosInModelSpace[3] = 1.0f;
+
+    lightPosInWorldSpace[0] = 0.0f;
+    lightPosInWorldSpace[1] = 0.0f;
+    lightPosInWorldSpace[2] = 0.0f;
+    lightPosInWorldSpace[3] = 0.0f;
+
+    lightPosInEyeSpace[0] = 0.0f;
+    lightPosInEyeSpace[1] = 0.0f;
+    lightPosInEyeSpace[2] = 0.0f;
+    lightPosInEyeSpace[3] = 0.0f;
+
 }
 
 Native8Lesson::~Native8Lesson() {
@@ -41,6 +65,7 @@ Native8Lesson::~Native8Lesson() {
     currentRotaion = nullptr;
     lightModelMatrix = nullptr;
 
+    heightMap->release();
     delete (heightMap);
     heightMap = nullptr;
 
@@ -97,6 +122,7 @@ void Native8Lesson::create() {
     currentRotaion = new Matrix();
     lightModelMatrix = new Matrix();
 
+    LOGD("create");
 }
 
 void Native8Lesson::change(int width, int height) {
@@ -114,7 +140,9 @@ void Native8Lesson::change(int width, int height) {
     float near = 1.0f;
     float far = 1000.0f;
 
-    projectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far)
+    projectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far);
+
+    LOGD("change");
 }
 
 void Native8Lesson::draw() {
@@ -127,21 +155,27 @@ void Native8Lesson::draw() {
     mvMatrixUniform = glGetUniformLocation(program, MV_MATRIX_UNIFORM.c_str());
     lightPosUniform = glGetAttribLocation(program, LIGHT_POSITION_UNIFORM.c_str());
 
-    posotionAttribute = glGetAttribLocation(program, POSITION_ATTRIBUTE.c_str());
-    normalAttribute = glGetAttribLocation(program, NORMAL_ATTRIBUTE.c_str());
-    colorAttribute = glGetAttribLocation(program, COLOR_ATTRIBUTE.c_str());
+    GLint positionAttribute = glGetAttribLocation(program, POSITION_ATTRIBUTE.c_str());
+    GLint normalAttribute = glGetAttribLocation(program, NORMAL_ATTRIBUTE.c_str());
+    GLint colorAttribute = glGetAttribLocation(program, COLOR_ATTRIBUTE.c_str());
+
+    if (heightMap != nullptr) {
+        heightMap->setPositionAttribute((GLuint) positionAttribute);
+        heightMap->setNormalAttribute((GLuint) normalAttribute);
+        heightMap->setColorAttribute((GLuint) colorAttribute);
+    }
 
     // Calculate position of the light. Push into the distance.
     lightModelMatrix->identity();
     lightModelMatrix->translate(0.0f, 7.5f, -8.0f);
 
-    Matrix::multiplyMV(lightPosInEyeSpace, lightModelMatrix->mData, lightPosInModelSpace);
+    Matrix::multiplyMV(lightPosInWorldSpace, lightModelMatrix->mData, lightPosInModelSpace);
     Matrix::multiplyMV(lightPosInEyeSpace, viewMatrix->mData, lightPosInWorldSpace);
 
     // Draw the heightmap
     // Translate the heightmap into the screen.
     modelMatrix->identity();
-    modelMatrix->translate(0.0f, 0.0f, -12f);
+    modelMatrix->translate(0.0f, 0.0f, -12.0f);
 
     // Set a matrix that contains the current rotation.
     currentRotaion->identity();
@@ -166,14 +200,17 @@ void Native8Lesson::draw() {
     // and stores the result the MVP matrix.
     // which currently contains model * view
     mvpMatrix->multiply(*viewMatrix, *modelMatrix);
+    glUniformMatrix4fv(mvMatrixUniform, 1, GL_FALSE, mvpMatrix->mData);
 
     // Pass in the combined matrix.
+    mvpMatrix->multiply(*projectionMatrix, *mvpMatrix);
     glUniformMatrix4fv(mvpMatrixUniform, 1, GL_FALSE, mvpMatrix->mData);
 
     glUniform3f(lightPosUniform, lightPosInEyeSpace[0], lightPosInEyeSpace[1],
                 lightPosInEyeSpace[2]);
 
     // Renderer the heightmap;
+    heightMap->render();
 }
 
 void Native8Lesson::setDelta(float x, float y) {

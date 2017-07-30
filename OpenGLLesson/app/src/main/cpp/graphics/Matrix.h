@@ -68,6 +68,16 @@ public:
                                const float *rhs);
 
     static void multiplyMV(float *r, const float *lhs, const float *rhs);
+
+    /**
+    * Computes the length of a vector.
+    *
+    * @param x x coordinate of a vector
+    * @param y y coordinate of a vector
+    * @param z z coordinate of a vector
+    * @return the length of a vector
+    */
+    static float length(float x, float y, float z);
 };
 
 #endif
